@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kosmos_Car 🚀</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #000, #001133);
+      color: white;
+      text-align: center;
+    }
+    h1 { font-size: 3rem; margin-top: 40px; }
+    .plan { background: rgba(255,255,255,0.05); margin: 20px auto; padding: 20px; border-radius: 15px; width: 300px; }
+    .btn { margin-top: 10px; padding: 10px 20px; border: none; border-radius: 10px; background: #00f; color: white; cursor: pointer; font-size: 1rem; }
+    .btn:hover { background: #009; }
+    #subscription { margin-top: 30px; }
+    input { padding: 10px; width: 200px; border-radius: 10px; border: none; margin-bottom: 10px; }
+    footer { margin-top: 50px; font-size: 0.9rem; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <h1>Kosmos_Car 🚀</h1>
+  <p>Чистота космического уровня 🌌</p>
+
+  <div id="register">
+    <h2>Регистрация</h2>
+    <input type="text" id="phone" placeholder="Введите номер телефона" />
+    <br/>
+    <button class="btn" onclick="register()">Войти</button>
+  </div>
+
+  <div id="plans" style="display:none;">
+    <h2>Выберите подписку</h2>
+    <div class="plan">
+      <h3>1 Месяц</h3>
+      <p>Цена: 15 000 драм</p>
+      <p>5 моек / 30 дней</p>
+      <button class="btn" onclick="buy('1 Месяц',15000,5,30)">Купить</button>
+    </div>
+    <div class="plan">
+      <h3>2 Месяца</h3>
+      <p>Цена: 28 000 драм</p>
+      <p>10 моек / 60 дней</p>
+      <button class="btn" onclick="buy('2 Месяца',28000,10,60)">Купить</button>
+    </div>
+    <div class="plan">
+      <h3>3 Месяца</h3>
+      <p>Цена: 43 000 драм</p>
+      <p>15 моек / 90 дней</p>
+      <button class="btn" onclick="buy('3 Месяца',43000,15,90)">Купить</button>
+    </div>
+  </div>
+
+  <div id="subscription" style="display:none;">
+    <h2>Ваш тариф: <span id="subName"></span></h2>
+    <p>Осталось моек: <span id="subRemaining"></span></p>
+    <p>Действует до: <span id="subExpiry"></span></p>
+    <button class="btn" onclick="useWash()">Списать 1 мойку</button>
+  </div>
+
+  <footer>
+    📍 Ереван | 📞 +374 98 520630
+  </footer>
+
+  <script>
+    let user = JSON.parse(localStorage.getItem('kosmos_user')) || null;
+
+    function register() {
+      const phone = document.getElementById('phone').value;
+      if(!phone) return alert('Введите номер телефона');
+      user = { phone, subscription:null };
+      localStorage.setItem('kosmos_user', JSON.stringify(user));
+      document.getElementById('register').style.display='none';
+      document.getElementById('plans').style.display='block';
+    }
+
+    function buy(name,price,washes,days){
+      const expiry = new Date(Date.now() + days*24*60*60*1000).toLocaleDateString();
+      user.subscription = {name,price,washes,remaining:washes,expiry};
+      localStorage.setItem('kosmos_user', JSON.stringify(user));
+      showSubscription();
+    }
+
+    function showSubscription(){
+      document.getElementById('plans').style.display='none';
+      document.getElementById('subscription').style.display='block';
+      document.getElementById('subName').innerText = user.subscription.name;
+      document.getElementById('subRemaining').innerText = user.subscription.remaining;
+      document.getElementById('subExpiry').innerText = user.subscription.expiry;
+    }
+
+    function useWash(){
+      if(user.subscription.remaining<=0) return alert('Мойки закончились');
+      user.subscription.remaining -=1;
+      localStorage.setItem('kosmos_user', JSON.stringify(user));
+      document.getElementById('subRemaining').innerText = user.subscription.remaining;
+    }
+
+    if(user){
+      if(user.subscription) showSubscription();
+      else{
+        document.getElementById('register').style.display='none';
+        document.getElementById('plans').style.display='block';
+      }
+    }
+  </script>
+</body>
+</html>
